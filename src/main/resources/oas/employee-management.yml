@@ -1,0 +1,120 @@
+openapi: '3.0.2'
+info:
+  title: Employee Management
+  version: '1.0'
+servers:
+  - url: https://api.server.test/v1
+    description: Test Server
+  - url: https://api.server.demo/v1
+    description: PreProd Server
+  - url: https://api.server/v1
+    description: Live Server
+paths:
+  /employee:
+    get:
+      description: Fetch all employee
+      operationId: employee-get-all
+      parameters:
+        - in: query
+          name: pageNo
+          schema:
+            type: integer
+          required: false
+          description: Start with 0 and goes until the pageSize
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Employee'
+        default:
+          description: User and Server errors 400, 401, 403, 404, 5XX
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      requestBody:
+        description: Employe Creation request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Employee'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+  /employee/{id}:
+    get:
+      responses:
+        '200':
+          description: OK
+    put:
+      requestBody:
+        description: Employe Creation request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Employee'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Employee'
+    delete:
+      responses:
+        '200':
+          description: OK
+
+components:
+  schemas:
+    Employee:
+      type: object
+      description: Employee Object
+      properties:
+        id:
+          description: Employee Id
+          type: integer
+          example: 1
+        name:
+          description: Employee Fullname
+          type: string
+          example: "John Doe"
+        jobType:
+          description: Employee jobType
+          type: string
+          enum:
+            - 'FULLTIME'
+            - 'CONTRACTOR'
+      required:
+        - name
+        - jobType
+    Error:
+      type: object
+      description: Exception during the GET, POST, PUT and DELETE
+      properties:
+        httpMethod:
+          type: string
+          enum:
+            - 'GET'
+            - 'POST'
+            - 'PUT'
+            - 'DELETE'
+        requestUri:
+          type: string
+          description: The request URI
+          example: /employee/1
+        statusCode:
+          type: integer
+          example: 404
+        message:
+          type: string
+          example: Employe 1 NotFound
