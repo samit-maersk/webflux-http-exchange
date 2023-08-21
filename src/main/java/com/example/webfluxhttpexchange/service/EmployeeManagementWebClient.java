@@ -1,9 +1,8 @@
 package com.example.webfluxhttpexchange.service;
 
 import com.example.webfluxhttpexchange.model.Employee;
-import com.example.webfluxhttpexchange.utility.EmployeeNotFoundException;
+import com.example.webfluxhttpexchange.utility.EmployeeCustomException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -22,7 +21,7 @@ public class EmployeeManagementWebClient implements EmployeeManagementService {
                 .uri(uriBuilder -> uriBuilder.path("/employee/{id}").build(id))
                 .retrieve()
                 .bodyToMono(Employee.class)
-                .onErrorContinue((e,e1) -> new EmployeeNotFoundException("not found"));
+                .onErrorContinue((e,e1) -> new EmployeeCustomException("not found"));
     }
 
     @Override

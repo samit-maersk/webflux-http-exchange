@@ -1,17 +1,12 @@
 package com.example.webfluxhttpexchange.service;
 
-import com.example.webfluxhttpexchange.model.Employee;
-import com.example.webfluxhttpexchange.model.JobType;
-import com.example.webfluxhttpexchange.utility.EmployeeNotFoundException;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import org.junit.jupiter.api.Assertions;
+import com.example.webfluxhttpexchange.utility.EmployeeCustomException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import reactor.test.StepVerifier;
@@ -68,13 +63,21 @@ public class EmployeeManagementServiceTest {
     void test02() {
         stubFor(get(urlEqualTo("/employee/2"))
                 .willReturn(aResponse()
-                        .withStatus(404)
+                        .withStatus(500)
+                        .withBody("""
+                                {
+                                    "httpMethod":"GET",
+                                    "requestUri":"/employee/2",
+                                    "statusCode":"404",
+                                    "message":"employee with id 2 not found"
+                                }
+                                """)
                 )
         );
 
         StepVerifier
                 .create(employeeManagementService.getEmployeeById(2))
-                .expectErrorMatches(throwable -> throwable instanceof EmployeeNotFoundException)
+                .expectErrorMatches(throwable -> throwable instanceof EmployeeCustomException)
                 .verify();
     }
 
