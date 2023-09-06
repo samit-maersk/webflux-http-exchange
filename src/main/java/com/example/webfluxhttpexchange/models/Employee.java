@@ -1,3 +1,3 @@
-package com.example.webfluxhttpexchange.model;
+package com.example.webfluxhttpexchange.models;
 
 public record Employee(long id, String name, JobType jobType) {}

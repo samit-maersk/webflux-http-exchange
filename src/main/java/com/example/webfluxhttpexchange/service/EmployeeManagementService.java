@@ -1,6 +1,6 @@
 package com.example.webfluxhttpexchange.service;
 
-import com.example.webfluxhttpexchange.model.Employee;
+import com.example.webfluxhttpexchange.models.Employee;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

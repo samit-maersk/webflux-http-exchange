@@ -1,7 +1,7 @@
 package com.example.webfluxhttpexchange.service;
 
-import com.example.webfluxhttpexchange.model.Employee;
-import com.example.webfluxhttpexchange.utility.EmployeeCustomException;
+import com.example.webfluxhttpexchange.models.Employee;
+import com.example.webfluxhttpexchange.EmployeeCustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -47,9 +47,7 @@ public class EmployeeManagementWebClient implements EmployeeManagementService {
     public Mono<Employee> update(long id, Employee employee) {
         return employeeWebClient
                 .put()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/employee/{id}")
-                        .build(id))
+                .uri("/employee/{id}", id)
                 .bodyValue(employee)
                 .retrieve()
                 .bodyToMono(Employee.class);

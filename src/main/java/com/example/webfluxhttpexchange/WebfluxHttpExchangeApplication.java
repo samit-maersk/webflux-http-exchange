@@ -1,16 +1,18 @@
 package com.example.webfluxhttpexchange;
 
-import com.example.webfluxhttpexchange.utility.EmployeeCustomException;
+import com.example.webfluxhttpexchange.httpclient.EmployeeClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.support.WebClientAdapter;
+import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import reactor.core.publisher.Mono;
 
 @SpringBootApplication
@@ -21,17 +23,27 @@ public class WebfluxHttpExchangeApplication {
 		SpringApplication.run(WebfluxHttpExchangeApplication.class, args);
 	}
 
-
-
+	@Value("${spring.application.employeeService.url}")
+	private String apiBaseUri;
 	@Bean
-	WebClient employeeWebClient(@Value("${spring.application.employeeService.url}")String uri) {
+	WebClient employeeWebClient() {
 		return WebClient
 				.builder()
-				.baseUrl(uri)
+				.baseUrl(apiBaseUri)
 				//Request Filter
-				.filter(this::filter)
+				//.filter(this::filter)
+				.defaultStatusHandler(HttpStatusCode::isError, response -> Mono.error(new EmployeeCustomException(response.statusCode().toString())))
 				.build();
 	}
+
+	@Bean
+	EmployeeClient employeeClient() {
+		HttpServiceProxyFactory factory = HttpServiceProxyFactory
+				.builder(WebClientAdapter.forClient(employeeWebClient()))
+				.build();
+		return factory.createClient(EmployeeClient.class);
+	}
+
 
 	private Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
 		return next

@@ -1,4 +1,4 @@
-package com.example.webfluxhttpexchange.model;
+package com.example.webfluxhttpexchange.models;
 
 public enum JobType {
     FULLTIME, CONTRACTOR
